@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+    environment {
+        dotnet = 'C:\\Program Files\\dotnet\\dotnet.exe'
+    }
+    stages {
+        stage('Checkout Stage') {
+            steps {
+                    git credentialsId: '', url: 'https://github.com/Chelseasingla1/WebApplication4'
+				
+				   }
+                }
+         stage('Clean Stage') {
+            steps {
+               dotnetClean project: 'E:\\sit331\\WebApplication4'
+            }
+        }
+        stage('Build Stage') {
+            steps {
+                dotnetBuild project: 'E:\\sit331\\WebApplication4'
+            }
+          }
+        stage('Test Stage') {
+            steps {
+                echo 'test stage'
+            }
+        }
+        stage('Deploy Stage') {
+            steps {
+             dotnetPublish project: 'E:\\sit331\\WebApplication4', selfContained: false
+            }
+        }
+        stage('SonarQube Analysis') {
+             steps {
+                bat "dotnet tool install --global dotnet-sonarscanner"
+                 bat "dotnet D:\\sonar-scanner-6.2.0.85879-net\\SonarScanner.MSBuild.dll begin /k:\"WebApplication4\" /d:sonar.login=\"\" "
+                 bat "dotnet build"
+                 bat "dotnet D:\\sonar-scanner-6.2.0.85879-net\\SonarScanner.MSBuild.dll end /d:sonar.login=\"\" "
+                    }
+  }
+   stage('Snyk Testing') {
+      steps {
+        echo 'Testing...'
+        snykSecurity(
+           snykInstallation: 'snyk@latest',
+           snykTokenId: 'SnykApiTokenForWeb'
+        )
+      }
+    }
+          stage('Organise to  Staging'){  
+              steps{
+                  bat 'xcopy  /s /i  "E:\\sit331\\WebApplication4\\bin\\Debug\\net8.0" "E:\\staging" /Y'
+                   }
+               }
+               stage('Integration Test') {
+            steps {
+                echo 'Integrating test'
+            }
+        } 
+           stage('Organise Files Production'){  
+              steps{
+                  bat 'xcopy  /s /i  "E:\\sit331\\WebApplication4\\bin\\Debug\\net8.0" "E:\\staging" /Y'
+                   }
+               }
+        
+    }
+   post {
+       success {
+            emailext subject: "Pipeline '${currentBuild.fullDisplayName}' Successful",
+                      body: 'The build was successful. Congratulations!',
+                      to: 'chelsea4777.be22@chitkara.edu.in',
+                      attachLog: true
+        }
+        failure {
+            emailext subject: "Pipeline '${currentBuild.fullDisplayName}' Failed",
+                      body: 'The build has failed. Please investigate.',
+                      to: 'chelsea4777.be22@chitkara.edu.in',
+                      attachLog: true
+        }
+   }
+}

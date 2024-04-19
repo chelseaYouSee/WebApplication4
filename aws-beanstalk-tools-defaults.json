@@ -1,0 +1,20 @@
+
+{
+    "region" : "ap-south-1",
+    "configuration" : "Debug",
+    "framework"     : "net8.0",
+    "self-contained" : true,
+    "application"    : "WebApplication4",
+    "environment"    : "WebApplication4-dev",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-034ecde1859149ccd\";\"aws:ec2:vpc,Subnets\"=\"subnet-0440ea4fa98f5f2fe\"",
+    "solution-stack"       : "64bit Amazon Linux 2 v2.6.5 running .NET Core",
+    "environment-type"     : "SingleInstance",
+    "cname"                : "webapplication4-dev",
+    "instance-type"        : "t3a.medium",
+    "key-pair"             : "Token",
+    "instance-profile"     : "ec2-newInstanceRole",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "proxy-server"         : "nginx"
+}
